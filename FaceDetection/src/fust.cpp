@@ -165,10 +165,14 @@ std::vector<seeta::FaceInfo> FuStDetector::Detect(
   }
 
   std::vector<std::vector<seeta::FaceInfo> > proposals_nms(hierarchy_size_[0]);
-  for (int32_t i = 0; i < hierarchy_size_[0]; i++) {
-    seeta::fd::NonMaximumSuppression(&(proposals[i]),
-      &(proposals_nms[i]), 0.8f);
-    proposals[i].clear();
+#pragma omp parallel num_threads(SEETA_NUM_THREADS)
+  {
+#pragma omp for nowait
+	  for (int32_t i = 0; i < hierarchy_size_[0]; i++) {
+		  seeta::fd::NonMaximumSuppression(&(proposals[i]),
+			  &(proposals_nms[i]), 0.8f);
+		  proposals[i].clear();
+	  }
   }
 
   // Following classifiers
