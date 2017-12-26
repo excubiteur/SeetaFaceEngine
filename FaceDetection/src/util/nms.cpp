@@ -34,6 +34,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <vector>
+#include <ppl.h>
 
 namespace seeta {
 namespace fd {
@@ -45,7 +46,7 @@ bool CompareBBox(const seeta::FaceInfo & a, const seeta::FaceInfo & b) {
 void NonMaximumSuppression(std::vector<seeta::FaceInfo>* bboxes,
   std::vector<seeta::FaceInfo>* bboxes_nms, float iou_thresh) {
   bboxes_nms->clear();
-  std::sort(bboxes->begin(), bboxes->end(), seeta::fd::CompareBBox);
+  concurrency::parallel_buffered_sort(bboxes->begin(), bboxes->end(), seeta::fd::CompareBBox);
 
   int32_t select_idx = 0;
   int32_t num_bbox = static_cast<int32_t>(bboxes->size());
